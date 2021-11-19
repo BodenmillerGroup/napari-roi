@@ -1,5 +1,5 @@
 from qtpy.QtCore import QAbstractTableModel, QModelIndex, QObject, Qt
-from typing import Any, MutableSequence, Optional
+from typing import Any, MutableSequence, Optional, Sequence
 
 from napari_roi._roi import ROIBase
 
@@ -9,12 +9,12 @@ class ROITableModel(QAbstractTableModel):
         self, rois: MutableSequence[ROIBase], parent: Optional[QObject] = None
     ):
         super(ROITableModel, self).__init__(parent=parent)
-        self.rois = rois
+        self._rois = rois
 
     def rowCount(self, parent: QModelIndex = QModelIndex()) -> int:
         if parent.isValid():
             return 0
-        return len(self.rois)
+        return len(self._rois)
 
     def columnCount(self, parent: QModelIndex = QModelIndex()) -> int:
         if parent.isValid():
@@ -31,15 +31,15 @@ class ROITableModel(QAbstractTableModel):
             Qt.ItemDataRole.EditRole,
         ):
             if index.column() == 0:
-                return self.rois[index.row()].name
+                return self._rois[index.row()].name
             if index.column() == 1:
-                return self.rois[index.row()].x
+                return self._rois[index.row()].x
             if index.column() == 2:
-                return self.rois[index.row()].y
+                return self._rois[index.row()].y
             if index.column() == 3:
-                return self.rois[index.row()].width
+                return self._rois[index.row()].width
             if index.column() == 4:
-                return self.rois[index.row()].height
+                return self._rois[index.row()].height
         return None
 
     def headerData(
@@ -66,15 +66,22 @@ class ROITableModel(QAbstractTableModel):
             and role == Qt.ItemDataRole.EditRole
         ):
             if index.column() == 0:
-                self.rois[index.row()].name = str(value)
+                str_value = str(value).strip()
+                if len(str_value) > 0 and not any(
+                    roi.name == str_value and i != index.row()
+                    for i, roi in enumerate(self._rois)
+                ):
+                    self._rois[index.row()].name = str_value
+                else:
+                    return False
             elif index.column() == 1:
                 try:
-                    self.rois[index.row()].x = float(value)
+                    self._rois[index.row()].x = float(value)
                 except ValueError:
                     return False
             elif index.column() == 2:
                 try:
-                    self.rois[index.row()].y = float(value)
+                    self._rois[index.row()].y = float(value)
                 except ValueError:
                     return False
             elif index.column() == 3:
@@ -83,7 +90,7 @@ class ROITableModel(QAbstractTableModel):
                 except ValueError:
                     return False
                 if float_value > 0:
-                    self.rois[index.row()].width = float_value
+                    self._rois[index.row()].width = float_value
                 else:
                     return False
             elif index.column() == 4:
@@ -92,7 +99,7 @@ class ROITableModel(QAbstractTableModel):
                 except ValueError:
                     return False
                 if float_value > 0:
-                    self.rois[index.row()].height = float_value
+                    self._rois[index.row()].height = float_value
                 else:
                     return False
             self.dataChanged.emit(
@@ -122,7 +129,7 @@ class ROITableModel(QAbstractTableModel):
         if 0 <= row <= self.rowCount() and count > 0 and not parent.isValid():
             self.beginInsertRows(parent, row, row + count - 1)
             for i in range(row, row + count):
-                self.rois.insert(i, ROIBase())
+                self._rois.insert(i, ROIBase())
             self.endInsertRows()
             return True
         return False
@@ -133,11 +140,23 @@ class ROITableModel(QAbstractTableModel):
         if 0 <= row < row + count <= self.rowCount() and not parent.isValid():
             self.beginRemoveRows(parent, row, row + count - 1)
             for i in range(row, row + count):
-                del self.rois[row]
+                del self._rois[row]
             self.endRemoveRows()
             return True
         return False
 
+    def refresh_rows(self, row_indices: Sequence[int]):
+        for row_index in row_indices:
+            self.dataChanged.emit(
+                self.createIndex(row_index, 0),
+                self.createIndex(row_index, self.columnCount() - 1),
+                [Qt.ItemDataRole.DisplayRole],
+            )
+
     def reset(self):
         self.beginResetModel()
         self.endResetModel()
+
+    @property
+    def rois(self) -> MutableSequence[ROIBase]:
+        return self._rois

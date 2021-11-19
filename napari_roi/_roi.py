@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import Optional
+from napari.utils.misc import StringEnum
 
 
 class ROIBase(ABC):
@@ -54,22 +54,6 @@ class ROIBase(ABC):
     def height(self, height: float):
         pass
 
-    def toROI(
-        self,
-        name: Optional[str] = None,
-        x: Optional[float] = None,
-        y: Optional[float] = None,
-        width: Optional[float] = None,
-        height: Optional[float] = None,
-    ) -> "ROI":
-        return ROI(
-            name=name or self.name,
-            x=x or self.x,
-            y=y or self.y,
-            width=width or self.width,
-            height=height or self.height,
-        )
-
 
 @dataclass
 class ROI(ROIBase):
@@ -78,3 +62,10 @@ class ROI(ROIBase):
     y: float = 0.0
     width: float = 100.0
     height: float = 100.0
+
+
+class ROIOrigin(StringEnum):
+    TOP_LEFT = "top left"
+    TOP_RIGHT = "top right"
+    BOTTOM_LEFT = "bottom left"
+    BOTTOM_RIGHT = "bottom right"

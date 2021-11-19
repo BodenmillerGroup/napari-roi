@@ -5,22 +5,19 @@ except ImportError:
 
 from napari_plugin_engine import napari_hook_implementation
 
-from napari_roi._roi import ROI, ROIBase
+from napari_roi._roi import ROI, ROIBase, ROIOrigin
 from napari_roi._roi_widget import ROIWidget
 
 
 @napari_hook_implementation
 def napari_experimental_provide_dock_widget():
-    return ROIWidget, {
-        "name": "regions of interest",
-        "area": "right",
-        "allowed_areas": ["left", "right"],
-    }
+    return ROIWidget, {"name": "regions of interest"}
 
 
 __all__ = [
     "ROI",
     "ROIBase",
+    "ROIOrigin",
     "ROIWidget",
     "napari_experimental_provide_dock_widget",
 ]

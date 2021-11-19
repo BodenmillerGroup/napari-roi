@@ -7,29 +7,37 @@ T = TypeVar("T")
 
 class MutableSequenceWrapper(MutableSequence[T]):
     def __init__(self, data: MutableSequence[T], model: QAbstractItemModel):
-        self.data = data
-        self.model = model
+        self._data = data
+        self._model = model
 
     def __getitem__(self, index: int) -> T:
-        return self.data[index]
+        return self._data[index]
 
     def __setitem__(self, index: int, item: T):
-        self.data[index] = item
-        self.model.dataChanged.emit(
-            self.model.createIndex(index, 0),
-            self.model.createIndex(index, self.model.columnCount() - 1),
+        self._data[index] = item
+        self._model.dataChanged.emit(
+            self._model.createIndex(index, 0),
+            self._model.createIndex(index, self._model.columnCount() - 1),
             [Qt.ItemDataRole.EditRole],
         )
 
     def __delitem__(self, index: int):
-        self.model.beginRemoveRows(QModelIndex(), index, index)
-        del self.data[index]
-        self.model.endRemoveRows()
+        self._model.beginRemoveRows(QModelIndex(), index, index)
+        del self._data[index]
+        self._model.endRemoveRows()
 
     def __len__(self):
-        return len(self.data)
+        return len(self._data)
 
     def insert(self, index: int, item: T):
-        self.model.beginInsertRows(QModelIndex(), index, index)
-        self.data.insert(index, item)
-        self.model.endInsertRows()
+        self._model.beginInsertRows(QModelIndex(), index, index)
+        self._data.insert(index, item)
+        self._model.endInsertRows()
+
+    @property
+    def data(self) -> MutableSequence[T]:
+        return self._data
+
+    @property
+    def model(self) -> QAbstractItemModel:
+        return self._model
