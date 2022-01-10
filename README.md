@@ -15,9 +15,13 @@ You can install `napari-roi` via [pip](https://pypi.org/project/pip/):
 
     pip install napari-roi
 
-To install latest development version :
+To install latest development version:
 
     pip install git+https://github.com/BodenmillerGroup/napari-roi.git
+
+## Usage
+
+The `napari-roi` plugin can be opened from within napari.
 
 ## Authors
 
