@@ -11,13 +11,13 @@ Select regions of interest (ROIs) using napari
 
 ## Installation
 
-You can install `napari-roi` via [pip](https://pypi.org/project/pip/):
+You can install napari-roi via [pip](https://pypi.org/project/pip/):
 
     pip install napari-roi
 
-To install latest development version:
+Alternatively, you can install napari-roi via [conda](https://conda.io/):
 
-    pip install git+https://github.com/BodenmillerGroup/napari-roi.git
+    conda install -c conda-forge napari-roi
 
 ## Usage
 
