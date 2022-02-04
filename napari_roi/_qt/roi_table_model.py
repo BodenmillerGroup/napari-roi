@@ -61,10 +61,7 @@ class ROITableModel(QAbstractTableModel):
         value: Any,
         role: Qt.ItemDataRole = Qt.ItemDataRole.EditRole,
     ) -> bool:
-        if (
-            0 <= index.row() < self.rowCount()
-            and role == Qt.ItemDataRole.EditRole
-        ):
+        if 0 <= index.row() < self.rowCount() and role == Qt.ItemDataRole.EditRole:
             if index.column() == 0:
                 str_value = str(value).strip()
                 if len(str_value) > 0 and not any(

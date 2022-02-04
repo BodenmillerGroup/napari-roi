@@ -34,10 +34,7 @@ class ROILayerAccessor(MutableSequence[ROIBase]):
             layer_properties = self._parent._layer.properties.copy()
             for layer_properties_key in layer_properties:
                 values = list(layer_properties[layer_properties_key])
-                if (
-                    layer_properties_key
-                    == ROILayerAccessor.ROI_NAME_PROPERTIES_KEY
-                ):
+                if layer_properties_key == ROILayerAccessor.ROI_NAME_PROPERTIES_KEY:
                     values.insert(self._index, roi.name)
                 else:
                     values.insert(self._index, np.nan)
@@ -117,9 +114,7 @@ class ROILayerAccessor(MutableSequence[ROIBase]):
             # convert the fixed-length string numpy array to list to allow for
             # longer strings than can be stored in the current numpy array
             roi_names = list(
-                self._parent._layer.properties[
-                    ROILayerAccessor.ROI_NAME_PROPERTIES_KEY
-                ]
+                self._parent._layer.properties[ROILayerAccessor.ROI_NAME_PROPERTIES_KEY]
             )
             roi_names[self._index] = name
             self._parent._layer.properties[
@@ -203,13 +198,9 @@ class ROILayerAccessor(MutableSequence[ROIBase]):
     def __init__(self, layer: Shapes):
         self._layer = layer
         if self.NEW_ROI_NAME_METADATA_KEY not in layer.metadata:
-            layer.metadata[
-                self.NEW_ROI_NAME_METADATA_KEY
-            ] = self.DEFAULT_NEW_ROI_NAME
+            layer.metadata[self.NEW_ROI_NAME_METADATA_KEY] = self.DEFAULT_NEW_ROI_NAME
         if self.NEW_ROI_WIDTH_METADATA_KEY not in layer.metadata:
-            layer.metadata[
-                self.NEW_ROI_WIDTH_METADATA_KEY
-            ] = self.DEFAULT_NEW_ROI_WIDTH
+            layer.metadata[self.NEW_ROI_WIDTH_METADATA_KEY] = self.DEFAULT_NEW_ROI_WIDTH
         if self.NEW_ROI_HEIGHT_METADATA_KEY not in layer.metadata:
             layer.metadata[
                 self.NEW_ROI_HEIGHT_METADATA_KEY
@@ -217,9 +208,7 @@ class ROILayerAccessor(MutableSequence[ROIBase]):
         if self.ROI_FILE_METADATA_KEY not in layer.metadata:
             layer.metadata[self.ROI_FILE_METADATA_KEY] = self.DEFAULT_ROI_FILE
         if self.ROI_ORIGIN_METADATA_KEY not in layer.metadata:
-            layer.metadata[
-                self.ROI_ORIGIN_METADATA_KEY
-            ] = self.DEFAULT_ROI_ORIGIN
+            layer.metadata[self.ROI_ORIGIN_METADATA_KEY] = self.DEFAULT_ROI_ORIGIN
         if self.ROI_NAME_PROPERTIES_KEY not in layer.properties:
             layer.properties[self.ROI_NAME_PROPERTIES_KEY] = np.array(
                 [""] * len(layer.data)
@@ -304,14 +293,9 @@ class ROILayerAccessor(MutableSequence[ROIBase]):
         if (
             self._layer.current_properties is not None
             and self.ROI_NAME_PROPERTIES_KEY in self._layer.current_properties
-            and len(
-                self._layer.current_properties[self.ROI_NAME_PROPERTIES_KEY]
-            )
-            == 1
+            and len(self._layer.current_properties[self.ROI_NAME_PROPERTIES_KEY]) == 1
         ):
-            return self._layer.current_properties[
-                self.ROI_NAME_PROPERTIES_KEY
-            ][0]
+            return self._layer.current_properties[self.ROI_NAME_PROPERTIES_KEY][0]
         return None
 
     @current_roi_name.setter
