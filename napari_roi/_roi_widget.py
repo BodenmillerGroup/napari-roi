@@ -37,9 +37,9 @@ class ROIWidget(QWidget):
     DEFAULT_COLUMN_WIDTHS = (120, 80, 80, 80, 80)
     ROI_LAYER_TEXT_COLOR = "red"
 
-    def __init__(self, viewer: Viewer):
-        super(ROIWidget, self).__init__(parent=viewer.window.qt_viewer)
-        self._viewer = viewer
+    def __init__(self, napari_viewer: Viewer, parent: Optional[QWidget] = None):
+        super(ROIWidget, self).__init__(parent=parent)
+        self._viewer = napari_viewer
         self._roi_layer: Optional[Shapes] = None
         self._roi_layer_accessor: Optional[ROILayerAccessor] = None
         self._roi_table_model: Optional[ROITableModel] = None
@@ -68,9 +68,7 @@ class ROIWidget(QWidget):
         self._new_roi_height_spinbox.valueChanged.connect(
             self._on_new_roi_height_spinbox_value_changed
         )
-        self._add_widget.layout().addRow(
-            "Height:", self._new_roi_height_spinbox
-        )
+        self._add_widget.layout().addRow("Height:", self._new_roi_height_spinbox)
         self._add_roi_button = QPushButton("Add ROI", parent=self._add_widget)
         self._add_roi_button.clicked.connect(self._on_add_roi_button_clicked)
         self._add_widget.layout().addRow(self._add_roi_button)
@@ -104,34 +102,24 @@ class ROIWidget(QWidget):
         self._roi_origin_combobox.currentTextChanged.connect(
             self._on_roi_origin_combobox_current_text_changed
         )
-        self._roi_table_widget.layout().addRow(
-            "X/Y origin:", self._roi_origin_combobox
-        )
+        self._roi_table_widget.layout().addRow("X/Y origin:", self._roi_origin_combobox)
 
         self._save_widget = QWidget(parent=self)
         self._save_widget.setLayout(QGridLayout())
         self._roi_file_edit = QLineEdit(parent=self)
         self._roi_file_edit.setReadOnly(True)
         self._roi_file_edit.addAction(
-            self.style().standardIcon(
-                QStyle.StandardPixmap.SP_DialogOpenButton
-            ),
+            self.style().standardIcon(QStyle.StandardPixmap.SP_DialogOpenButton),
             QLineEdit.ActionPosition.TrailingPosition,
         ).triggered.connect(self._on_save_file_edit_browse_action_triggered)
         self._save_widget.layout().addWidget(self._roi_file_edit, 0, 0, 1, 2)
-        self._autosave_checkbox = QCheckBox(
-            "Autosave", parent=self._save_widget
-        )
+        self._autosave_checkbox = QCheckBox("Autosave", parent=self._save_widget)
         self._autosave_checkbox.stateChanged.connect(
             self._on_autosave_checkbox_state_changed
         )
-        self._save_widget.layout().addWidget(
-            self._autosave_checkbox, 1, 0, 1, 1
-        )
+        self._save_widget.layout().addWidget(self._autosave_checkbox, 1, 0, 1, 1)
         self._save_button = QPushButton(
-            self.style().standardIcon(
-                QStyle.StandardPixmap.SP_DialogSaveButton
-            ),
+            self.style().standardIcon(QStyle.StandardPixmap.SP_DialogSaveButton),
             "Save",
             parent=self._save_widget,
         )
@@ -172,33 +160,25 @@ class ROIWidget(QWidget):
 
     def _on_roi_layer_changed(self, old_roi_layer: Optional[Shapes]):
         if old_roi_layer is not None:
-            old_roi_layer.events.data.disconnect(
-                self._on_roi_layer_data_changed
-            )
+            old_roi_layer.events.data.disconnect(self._on_roi_layer_data_changed)
             old_roi_layer.events.properties.disconnect(
                 self._on_roi_layer_properties_changed
             )
             old_roi_layer.events.current_properties.disconnect(
                 self._on_roi_layer_current_properties_changed
             )
-            old_roi_layer.mouse_drag_callbacks.remove(
-                self._on_roi_layer_mouse_drag
-            )
+            old_roi_layer.mouse_drag_callbacks.remove(self._on_roi_layer_mouse_drag)
         if self._roi_layer is not None:
             self._roi_layer_accessor = ROILayerAccessor(self._roi_layer)
             self._roi_table_model = ROITableModel(self._roi_layer_accessor)
-            self._roi_layer.events.data.connect(
-                self._on_roi_layer_data_changed
-            )
+            self._roi_layer.events.data.connect(self._on_roi_layer_data_changed)
             self._roi_layer.events.properties.connect(
                 self._on_roi_layer_properties_changed
             )
             self._roi_layer.events.current_properties.connect(
                 self._on_roi_layer_current_properties_changed
             )
-            self._roi_layer.mouse_drag_callbacks.append(
-                self._on_roi_layer_mouse_drag
-            )
+            self._roi_layer.mouse_drag_callbacks.append(self._on_roi_layer_mouse_drag)
             self._update_roi_layer_text()
             self.setEnabled(True)
         else:
@@ -262,9 +242,7 @@ class ROIWidget(QWidget):
         if index.isValid():
             menu = QMenu()
             del_action = menu.addAction(
-                self.style().standardIcon(
-                    QStyle.StandardPixmap.SP_DialogCloseButton
-                ),
+                self.style().standardIcon(QStyle.StandardPixmap.SP_DialogCloseButton),
                 "Delete",
             )
             if menu.exec(self._roi_table_view.mapToGlobal(pos)) == del_action:
@@ -342,9 +320,7 @@ class ROIWidget(QWidget):
             yield
             self._refresh_roi_table_widget()
             while event.type == "mouse_move":
-                self._refresh_roi_table_widget(
-                    row_indices=roi_layer.selected_data
-                )
+                self._refresh_roi_table_widget(row_indices=roi_layer.selected_data)
                 yield
 
     def _update_layout(self, horizontal: bool):
@@ -353,15 +329,13 @@ class ROIWidget(QWidget):
                 self._add_widget,
                 0,
                 0,
-                alignment=Qt.AlignmentFlag.AlignLeft
-                | Qt.AlignmentFlag.AlignTop,
+                alignment=Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignTop,
             )
             self.layout().addWidget(
                 self._save_widget,
                 1,
                 0,
-                alignment=Qt.AlignmentFlag.AlignLeft
-                | Qt.AlignmentFlag.AlignBottom,
+                alignment=Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignBottom,
             )
             self.layout().addWidget(self._roi_table_widget, 0, 1, 2, 1)
         else:
@@ -384,9 +358,7 @@ class ROIWidget(QWidget):
             self._new_roi_width_spinbox.setValue(self.new_roi_width)
             self._new_roi_height_spinbox.setValue(self.new_roi_height)
 
-    def _refresh_roi_table_widget(
-        self, row_indices: Optional[Sequence[int]] = None
-    ):
+    def _refresh_roi_table_widget(self, row_indices: Optional[Sequence[int]] = None):
         if self._roi_table_model is not None:
             if row_indices is not None:
                 self._roi_table_model.refresh_rows(row_indices)
@@ -399,9 +371,7 @@ class ROIWidget(QWidget):
         self._roi_file_edit.setEnabled(not self.autosave)
         self._roi_file_edit.setText(str(self.roi_file or ""))
         self._autosave_checkbox.setEnabled(self.roi_file is not None)
-        self._save_button.setEnabled(
-            self.roi_file is not None and not self.autosave
-        )
+        self._save_button.setEnabled(self.roi_file is not None and not self.autosave)
 
     def _create_roi_name(self) -> str:
         assert self._roi_layer_accessor is not None
@@ -455,9 +425,7 @@ class ROIWidget(QWidget):
     def get_rois(self) -> MutableSequence[ROIBase]:
         assert self._roi_layer_accessor is not None
         assert self._roi_table_model is not None
-        return MutableSequenceWrapper(
-            self._roi_layer_accessor, self._roi_table_model
-        )
+        return MutableSequenceWrapper(self._roi_layer_accessor, self._roi_table_model)
 
     @property
     def viewer(self) -> Viewer:
