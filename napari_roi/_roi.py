@@ -11,7 +11,7 @@ class ROIBase(ABC):
 
     @name.setter
     @abstractmethod
-    def name(self, name: str):
+    def name(self, name: str) -> None:
         pass
 
     @property
@@ -21,7 +21,7 @@ class ROIBase(ABC):
 
     @x.setter
     @abstractmethod
-    def x(self, x: float):
+    def x(self, x: float) -> None:
         pass
 
     @property
@@ -31,7 +31,7 @@ class ROIBase(ABC):
 
     @y.setter
     @abstractmethod
-    def y(self, y: float):
+    def y(self, y: float) -> None:
         pass
 
     @property
@@ -41,7 +41,7 @@ class ROIBase(ABC):
 
     @width.setter
     @abstractmethod
-    def width(self, width: float):
+    def width(self, width: float) -> None:
         pass
 
     @property
@@ -51,7 +51,7 @@ class ROIBase(ABC):
 
     @height.setter
     @abstractmethod
-    def height(self, height: float):
+    def height(self, height: float) -> None:
         pass
 
 

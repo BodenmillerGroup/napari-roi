@@ -1,13 +1,13 @@
 from qtpy.QtCore import QAbstractTableModel, QModelIndex, QObject, Qt
 from typing import Any, MutableSequence, Optional, Sequence
 
-from napari_roi._roi import ROIBase
+from .. import ROIBase
 
 
 class ROITableModel(QAbstractTableModel):
     def __init__(
         self, rois: MutableSequence[ROIBase], parent: Optional[QObject] = None
-    ):
+    ) -> None:
         super(ROITableModel, self).__init__(parent=parent)
         self._rois = rois
 
@@ -142,7 +142,7 @@ class ROITableModel(QAbstractTableModel):
             return True
         return False
 
-    def refresh_rows(self, row_indices: Sequence[int]):
+    def refresh_rows(self, row_indices: Sequence[int]) -> None:
         for row_index in row_indices:
             self.dataChanged.emit(
                 self.createIndex(row_index, 0),
@@ -150,7 +150,7 @@ class ROITableModel(QAbstractTableModel):
                 [Qt.ItemDataRole.DisplayRole],
             )
 
-    def reset(self):
+    def reset(self) -> None:
         self.beginResetModel()
         self.endResetModel()
 

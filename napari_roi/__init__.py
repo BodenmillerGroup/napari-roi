@@ -5,8 +5,8 @@ except ImportError:
 
 from napari_plugin_engine import napari_hook_implementation
 
-from napari_roi._roi import ROI, ROIBase, ROIOrigin
-from napari_roi._roi_widget import ROIWidget
+from ._roi import ROI, ROIBase, ROIOrigin
+from ._roi_widget import ROIWidget
 
 
 @napari_hook_implementation
