@@ -37,6 +37,8 @@ class ROIWidget(QWidget):
 
     def __init__(self, napari_viewer: Viewer, parent: Optional[QWidget] = None) -> None:
         super(ROIWidget, self).__init__(parent=parent)
+        self._initialized = False
+
         self._viewer = napari_viewer
         self._roi_layer: Optional[Shapes] = None
         self._roi_layer_accessor: Optional[ROILayerAccessor] = None
@@ -139,6 +141,8 @@ class ROIWidget(QWidget):
         self._viewer.layers.selection.events.active.connect(
             self._on_active_layer_changed
         )
+
+        self._initialized = True
 
     def eventFilter(self, obj: QObject, event: QEvent) -> bool:
         if event.type() == QEvent.Type.ParentChange:
@@ -291,7 +295,7 @@ class ROIWidget(QWidget):
     def _on_roi_origin_combo_box_current_text_changed(self, text: str) -> None:
         self.roi_origin = ROIOrigin(text)
         self._refresh_roi_table_widget()
-        if self.autosave_roi_file:
+        if self._initialized and self.autosave_roi_file:
             self.save_roi_file()
 
     def _on_roi_file_line_edit_browse_action_triggered(self, checked: bool) -> None:
@@ -331,7 +335,7 @@ class ROIWidget(QWidget):
     ) -> None:
         self.autosave_roi_file = state == Qt.CheckState.Checked
         self._refresh_save_widget()
-        if state == Qt.CheckState.Checked:
+        if self._initialized and state == Qt.CheckState.Checked:
             self.save_roi_file()
 
     def _on_save_push_button_clicked(self, checked: bool) -> None:
@@ -339,12 +343,12 @@ class ROIWidget(QWidget):
 
     def _on_roi_layer_data_changed(self, event: Event) -> None:
         self._refresh_roi_table_widget()
-        if self.autosave_roi_file:
+        if self._initialized and self.autosave_roi_file:
             self.save_roi_file()
 
     def _on_roi_layer_properties_changed(self, event: Event) -> None:
         self._refresh_roi_table_widget()
-        if self.autosave_roi_file:
+        if self._initialized and self.autosave_roi_file:
             self.save_roi_file()
 
     def _on_roi_layer_mouse_drag(self, roi_layer: Shapes, event: MouseEvent) -> None:
