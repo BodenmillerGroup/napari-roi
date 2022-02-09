@@ -18,12 +18,14 @@ class ROILayerAccessor(MutableSequence[ROIBase]):
     NEW_ROI_HEIGHT_METADATA_KEY = "new_roi_height"
     ROI_ORIGIN_METADATA_KEY = "roi_origin"
     ROI_FILE_METADATA_KEY = "roi_file"
+    AUTOSAVE_ROI_FILE_METADATA_KEY = "autosave_roi_file"
 
     DEFAULT_NEW_ROI_NAME = "New ROI"
     DEFAULT_NEW_ROI_WIDTH = 100.0
     DEFAULT_NEW_ROI_HEIGHT = 100.0
     DEFAULT_ROI_ORIGIN = ROIOrigin.CENTER
     DEFAULT_ROI_FILE = ""
+    DEFAULT_AUTOSAVE_ROI_FILE = False
 
     class ItemAccessor(ROIBase):
         def __init__(self, parent: "ROILayerAccessor", index: int) -> None:
@@ -240,6 +242,10 @@ class ROILayerAccessor(MutableSequence[ROIBase]):
             layer.metadata[self.ROI_ORIGIN_METADATA_KEY] = self.DEFAULT_ROI_ORIGIN
         if self.ROI_FILE_METADATA_KEY not in layer.metadata:
             layer.metadata[self.ROI_FILE_METADATA_KEY] = self.DEFAULT_ROI_FILE
+        if self.AUTOSAVE_ROI_FILE_METADATA_KEY not in layer.metadata:
+            layer.metadata[
+                self.AUTOSAVE_ROI_FILE_METADATA_KEY
+            ] = self.DEFAULT_AUTOSAVE_ROI_FILE
 
     def insert(self, index: int, roi: ROIBase) -> None:
         ROILayerAccessor.ItemAccessor(self, index).insert(roi)
@@ -312,6 +318,14 @@ class ROILayerAccessor(MutableSequence[ROIBase]):
     @roi_file.setter
     def roi_file(self, roi_file: Optional[Path]) -> None:
         self._layer.metadata[self.ROI_FILE_METADATA_KEY] = str(roi_file or "")
+
+    @property
+    def autosave_roi_file(self) -> bool:
+        return self._layer.metadata[self.AUTOSAVE_ROI_FILE_METADATA_KEY]
+
+    @autosave_roi_file.setter
+    def autosave_roi_file(self, autosave_roi_file: bool) -> None:
+        self._layer.metadata[self.AUTOSAVE_ROI_FILE_METADATA_KEY] = autosave_roi_file
 
     @property
     def current_roi_name(self) -> Optional[str]:

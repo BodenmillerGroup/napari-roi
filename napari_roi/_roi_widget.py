@@ -115,11 +115,13 @@ class ROIWidget(QWidget):
             QLineEdit.ActionPosition.TrailingPosition,
         ).triggered.connect(self._on_roi_file_line_edit_browse_action_triggered)
         save_widget_layout.addWidget(self._roi_file_line_edit, 0, 0, 1, 2)
-        self._autosave_check_box = QCheckBox("Autosave", parent=self._save_widget)
-        self._autosave_check_box.stateChanged.connect(
-            self._on_autosave_check_box_state_changed
+        self._autosave_roi_file_check_box = QCheckBox(
+            "Autosave", parent=self._save_widget
         )
-        save_widget_layout.addWidget(self._autosave_check_box, 1, 0, 1, 1)
+        self._autosave_roi_file_check_box.stateChanged.connect(
+            self._on_autosave_roi_file_check_box_state_changed
+        )
+        save_widget_layout.addWidget(self._autosave_roi_file_check_box, 1, 0, 1, 1)
         self._save_push_button = QPushButton(
             self.style().standardIcon(QStyle.StandardPixmap.SP_DialogSaveButton),
             "Save",
@@ -239,7 +241,6 @@ class ROIWidget(QWidget):
             selection_model.selectionChanged.connect(
                 self._on_roi_table_view_selection_changed
             )
-        self.autosave = False
         self._refresh_add_widget()
         self._refresh_roi_table_widget()
         self._refresh_save_widget()
@@ -290,7 +291,7 @@ class ROIWidget(QWidget):
     def _on_roi_origin_combo_box_current_text_changed(self, text: str) -> None:
         self.roi_origin = ROIOrigin(text)
         self._refresh_roi_table_widget()
-        if self.autosave:
+        if self.autosave_roi_file:
             self.save_roi_file()
 
     def _on_roi_file_line_edit_browse_action_triggered(self, checked: bool) -> None:
@@ -316,8 +317,8 @@ class ROIWidget(QWidget):
                 answer = QMessageBox.question(
                     self,
                     "Load existing ROIs",
-                    "Do you want to load existing ROIs "
-                    "and add them to the current layer?",
+                    "Do you want to load existing ROIs and add them to the current"
+                    " layer, applying the currently selected X/Y origin?",
                     buttons=QMessageBox.StandardButton.No
                     | QMessageBox.StandardButton.Yes,
                     defaultButton=QMessageBox.StandardButton.No,
@@ -325,23 +326,26 @@ class ROIWidget(QWidget):
                 if answer == QMessageBox.StandardButton.Yes:
                     self.load_roi_file()
 
-    def _on_autosave_check_box_state_changed(self, state: Qt.CheckState) -> None:
+    def _on_autosave_roi_file_check_box_state_changed(
+        self, state: Qt.CheckState
+    ) -> None:
+        self.autosave_roi_file = state == Qt.CheckState.Checked
+        self._refresh_save_widget()
         if state == Qt.CheckState.Checked:
             self.save_roi_file()
-        self._refresh_save_widget()
 
     def _on_save_push_button_clicked(self, checked: bool) -> None:
         self.save_roi_file()
 
     def _on_roi_layer_data_changed(self, event: Event) -> None:
-        if self.autosave:
-            self.save_roi_file()
         self._refresh_roi_table_widget()
+        if self.autosave_roi_file:
+            self.save_roi_file()
 
     def _on_roi_layer_properties_changed(self, event: Event) -> None:
-        if self.autosave:
-            self.save_roi_file()
         self._refresh_roi_table_widget()
+        if self.autosave_roi_file:
+            self.save_roi_file()
 
     def _on_roi_layer_mouse_drag(self, roi_layer: Shapes, event: MouseEvent) -> None:
         if roi_layer.mode.startswith("add_"):
@@ -401,11 +405,13 @@ class ROIWidget(QWidget):
             self._roi_origin_combo_box.setCurrentText(str(self.roi_origin))
 
     def _refresh_save_widget(self) -> None:
-        self._roi_file_line_edit.setEnabled(not self.autosave)
+        self._roi_file_line_edit.setEnabled(not self.autosave_roi_file)
         self._roi_file_line_edit.setText(str(self.roi_file or ""))
-        self._autosave_check_box.setEnabled(self.roi_file is not None)
+        self._autosave_roi_file_check_box.setEnabled(self.roi_file is not None)
+        if self._roi_layer_accessor is not None:
+            self._autosave_roi_file_check_box.setChecked(self.autosave_roi_file)
         self._save_push_button.setEnabled(
-            self.roi_file is not None and not self.autosave
+            self.roi_file is not None and not self.autosave_roi_file
         )
 
     def _create_roi_name(self) -> str:
@@ -507,6 +513,18 @@ class ROIWidget(QWidget):
         )
 
     @property
+    def autosave_roi_file(self) -> bool:
+        if self._roi_layer_accessor is not None:
+            return self._roi_layer_accessor.autosave_roi_file
+        return False
+
+    @autosave_roi_file.setter
+    def autosave_roi_file(self, autosave_roi_file: bool) -> None:
+        assert self._roi_layer_accessor is not None
+        self._roi_layer_accessor.autosave_roi_file = autosave_roi_file
+        self._autosave_roi_file_check_box.setChecked(autosave_roi_file)
+
+    @property
     def current_roi_name(self) -> Optional[str]:
         if self._roi_layer_accessor is not None:
             return self._roi_layer_accessor.current_roi_name
@@ -516,11 +534,3 @@ class ROIWidget(QWidget):
     def current_roi_name(self, current_roi_name: str) -> None:
         assert self._roi_layer_accessor is not None
         self._roi_layer_accessor.current_roi_name = current_roi_name
-
-    @property
-    def autosave(self) -> bool:
-        return self._autosave_check_box.isChecked()
-
-    @autosave.setter
-    def autosave(self, autosave: bool) -> None:
-        self._autosave_check_box.setChecked(autosave)
