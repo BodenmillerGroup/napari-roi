@@ -22,7 +22,7 @@ class ROILayerAccessor(MutableSequence[ROIBase]):
     DEFAULT_NEW_ROI_NAME = "New ROI"
     DEFAULT_NEW_ROI_WIDTH = 100.0
     DEFAULT_NEW_ROI_HEIGHT = 100.0
-    DEFAULT_ROI_ORIGIN = ROIOrigin.TOP_LEFT
+    DEFAULT_ROI_ORIGIN = ROIOrigin.CENTER
     DEFAULT_ROI_FILE = ""
 
     class ItemAccessor(ROIBase):
@@ -112,6 +112,10 @@ class ROILayerAccessor(MutableSequence[ROIBase]):
 
         @property
         def x(self) -> float:
+            if self._parent.roi_origin == ROIOrigin.CENTER:
+                return 0.5 * (
+                    float(np.amin(self.data[:, -1])) + float(np.amax(self.data[:, -1]))
+                )
             if self._parent.roi_origin in (
                 ROIOrigin.TOP_LEFT,
                 ROIOrigin.BOTTOM_LEFT,
@@ -130,6 +134,10 @@ class ROILayerAccessor(MutableSequence[ROIBase]):
 
         @property
         def y(self) -> float:
+            if self._parent.roi_origin == ROIOrigin.CENTER:
+                return 0.5 * (
+                    float(np.amin(self.data[:, -2])) + float(np.amax(self.data[:, -2]))
+                )
             if self._parent.roi_origin in (
                 ROIOrigin.TOP_LEFT,
                 ROIOrigin.TOP_RIGHT,
@@ -167,6 +175,15 @@ class ROILayerAccessor(MutableSequence[ROIBase]):
             self.data = (self.data - origin) * scale + origin
 
         def _create_rectangle_data(self, roi: ROIBase) -> np.ndarray:
+            if self._parent.roi_origin == ROIOrigin.CENTER:
+                return np.array(
+                    [
+                        [roi.y - roi.height / 2.0, roi.x - roi.width / 2.0],
+                        [roi.y - roi.height / 2.0, roi.x + roi.width / 2.0],
+                        [roi.y + roi.height / 2.0, roi.x + roi.width / 2.0],
+                        [roi.y + roi.height / 2.0, roi.x - roi.width / 2.0],
+                    ]
+                )
             if self._parent.roi_origin == ROIOrigin.TOP_LEFT:
                 return np.array(
                     [

@@ -65,6 +65,7 @@ class ROI(ROIBase):
 
 
 class ROIOrigin(StringEnum):
+    CENTER = "center"
     TOP_LEFT = "top left"
     TOP_RIGHT = "top right"
     BOTTOM_LEFT = "bottom left"

@@ -93,6 +93,7 @@ class ROIWidget(QWidget):
         self._roi_origin_combo_box.setFixedWidth(200)
         self._roi_origin_combo_box.addItems(
             (
+                str(ROIOrigin.CENTER),
                 str(ROIOrigin.TOP_LEFT),
                 str(ROIOrigin.TOP_RIGHT),
                 str(ROIOrigin.BOTTOM_LEFT),
