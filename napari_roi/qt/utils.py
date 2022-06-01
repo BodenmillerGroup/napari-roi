@@ -1,6 +1,7 @@
 from collections.abc import MutableSequence
-from qtpy.QtCore import QAbstractItemModel, QModelIndex, Qt
 from typing import TypeVar
+
+from qtpy.QtCore import QAbstractItemModel, QModelIndex, Qt
 
 T = TypeVar("T")
 

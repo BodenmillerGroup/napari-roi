@@ -1,10 +1,11 @@
-import pandas as pd
 import re
+from pathlib import Path
+from typing import TYPE_CHECKING, MutableSequence, Optional, Sequence
 
+import pandas as pd
 from napari.layers import Shapes
 from napari.utils.events import Event
 from napari.viewer import Viewer
-from pathlib import Path
 from qtpy.QtCore import QEvent, QItemSelection, QObject, QPoint, Qt
 from qtpy.QtWidgets import (
     QCheckBox,
@@ -23,12 +24,13 @@ from qtpy.QtWidgets import (
     QTableView,
     QWidget,
 )
-from typing import MutableSequence, Optional, Sequence
-from vispy.app.canvas import MouseEvent
 
 from ._roi import ROI, ROIBase, ROIOrigin
 from .qt import ROILayerAccessor, ROITableModel
 from .qt.utils import MutableItemModelSequenceWrapper
+
+if TYPE_CHECKING:
+    from vispy.app.canvas import MouseEvent
 
 
 class ROIWidget(QWidget):
@@ -351,7 +353,7 @@ class ROIWidget(QWidget):
         if self._initialized and self.autosave_roi_file:
             self.save_roi_file()
 
-    def _on_roi_layer_mouse_drag(self, roi_layer: Shapes, event: MouseEvent) -> None:
+    def _on_roi_layer_mouse_drag(self, roi_layer: Shapes, event: "MouseEvent") -> None:
         if roi_layer.mode.startswith("add_"):
             self.current_roi_name = self._create_roi_name()
         if roi_layer.mode.startswith("add_") or roi_layer.mode in (

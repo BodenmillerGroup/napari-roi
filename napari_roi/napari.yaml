@@ -1,0 +1,10 @@
+name: napari-roi
+schema_version: 0.1.0
+contributions:
+  commands:
+  - id: napari-roi.ROIWidget
+    title: Create regions of interest
+    python_name: napari_roi:ROIWidget
+  widgets:
+  - command: napari-roi.ROIWidget
+    display_name: regions of interest

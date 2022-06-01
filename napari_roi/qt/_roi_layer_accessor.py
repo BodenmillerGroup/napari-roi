@@ -1,11 +1,11 @@
-import numpy as np
-import pandas as pd
-
 from collections.abc import MutableSequence
-from napari.layers import Shapes
-from napari.layers.utils.layer_utils import features_to_pandas_dataframe
 from pathlib import Path
 from typing import Optional
+
+import numpy as np
+import pandas as pd
+from napari.layers import Shapes
+from napari.layers.utils.layer_utils import features_to_pandas_dataframe
 
 from .. import ROIBase, ROIOrigin
 

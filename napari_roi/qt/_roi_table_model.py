@@ -1,5 +1,6 @@
-from qtpy.QtCore import QAbstractTableModel, QModelIndex, QObject, Qt
 from typing import Any, MutableSequence, Optional, Sequence
+
+from qtpy.QtCore import QAbstractTableModel, QModelIndex, QObject, Qt
 
 from .. import ROIBase
 
