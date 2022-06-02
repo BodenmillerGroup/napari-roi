@@ -162,15 +162,17 @@ class ROIWidget(QWidget):
         except Exception as e:
             QMessageBox.warning(self._viewer.window.qt_viewer, "Error", e)
         if df is not None:
-            for i, row in df.iterrows():
-                roi = ROI(
-                    name=row["Name"],
-                    x=row["X"],
-                    y=row["Y"],
-                    width=row["W"],
-                    height=row["H"],
-                )
-                self._roi_layer_accessor.append(roi)
+            with self._roi_layer.events.blocker_all():
+                for i, row in df.iterrows():
+                    roi = ROI(
+                        name=row["Name"],
+                        x=row["X"],
+                        y=row["Y"],
+                        width=row["W"],
+                        height=row["H"],
+                    )
+                    self._roi_layer_accessor.append(roi)
+            self._roi_layer.refresh()
             self._refresh_roi_table_widget()
 
     def save_roi_file(self) -> None:
