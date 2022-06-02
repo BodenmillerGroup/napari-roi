@@ -6,7 +6,7 @@ import pandas as pd
 from napari.layers import Shapes
 from napari.utils.events import Event
 from napari.viewer import Viewer
-from qtpy.QtCore import QEvent, QItemSelection, QObject, QPoint, Qt
+from qtpy.QtCore import QEvent, QItemSelection, QObject, QPoint, QSignalBlocker, Qt
 from qtpy.QtWidgets import (
     QCheckBox,
     QComboBox,
@@ -395,9 +395,12 @@ class ROIWidget(QWidget):
 
     def _refresh_add_widget(self) -> None:
         if self._roi_layer_accessor is not None:
-            self._new_roi_name_line_edit.setText(self.new_roi_name)
-            self._new_roi_width_double_spin_box.setValue(self.new_roi_width)
-            self._new_roi_height_double_spin_box.setValue(self.new_roi_height)
+            with QSignalBlocker(self._new_roi_name_line_edit):
+                self._new_roi_name_line_edit.setText(self.new_roi_name)
+            with QSignalBlocker(self._new_roi_width_double_spin_box):
+                self._new_roi_width_double_spin_box.setValue(self.new_roi_width)
+            with QSignalBlocker(self._new_roi_height_double_spin_box):
+                self._new_roi_height_double_spin_box.setValue(self.new_roi_height)
 
     def _refresh_roi_table_widget(
         self, row_indices: Optional[Sequence[int]] = None
@@ -408,14 +411,17 @@ class ROIWidget(QWidget):
             else:
                 self._roi_table_model.reset()
         if self._roi_layer_accessor is not None:
-            self._roi_origin_combo_box.setCurrentText(str(self.roi_origin))
+            with QSignalBlocker(self._roi_origin_combo_box):
+                self._roi_origin_combo_box.setCurrentText(str(self.roi_origin))
 
     def _refresh_save_widget(self) -> None:
         self._roi_file_line_edit.setEnabled(not self.autosave_roi_file)
-        self._roi_file_line_edit.setText(str(self.roi_file or ""))
+        with QSignalBlocker(self._roi_file_line_edit):
+            self._roi_file_line_edit.setText(str(self.roi_file or ""))
         self._autosave_roi_file_check_box.setEnabled(self.roi_file is not None)
         if self._roi_layer_accessor is not None:
-            self._autosave_roi_file_check_box.setChecked(self.autosave_roi_file)
+            with QSignalBlocker(self._autosave_roi_file_check_box):
+                self._autosave_roi_file_check_box.setChecked(self.autosave_roi_file)
         self._save_push_button.setEnabled(
             self.roi_file is not None and not self.autosave_roi_file
         )
