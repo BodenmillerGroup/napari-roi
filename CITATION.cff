@@ -1,0 +1,7 @@
+cff-version: 1.2.0
+message: If you use this plugin, please cite it using these metadata
+title: 'napari-roi: Select regions of interest (ROIs) using napari'
+url: https://github.com/BodenmillerGroup/napari-roi
+authors:
+- given-names: Jonas
+  family-names: Windhager
