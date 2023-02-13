@@ -162,6 +162,7 @@ class ROIWidget(QWidget):
         except Exception as e:
             QMessageBox.warning(self._viewer.window.qt_viewer, "Error", e)
         if df is not None:
+            assert self._roi_layer is not None
             with self._roi_layer.events.blocker_all():
                 for i, row in df.iterrows():
                     roi = ROI(
@@ -230,7 +231,7 @@ class ROIWidget(QWidget):
             )
             self._roi_layer.mouse_drag_callbacks.append(self._on_roi_layer_mouse_drag)
             self._roi_layer.text = ROILayerAccessor.ROI_NAME_FEATURES_KEY
-            self._roi_layer.text.color = self.ROI_LAYER_TEXT_COLOR
+            self._roi_layer.text.color = self.ROI_LAYER_TEXT_COLOR  # type: ignore
             self.setEnabled(True)
         else:
             self._roi_layer_accessor = None
@@ -280,6 +281,7 @@ class ROIWidget(QWidget):
     def _on_roi_table_view_selection_changed(
         self, selected: QItemSelection, deselected: QItemSelection
     ) -> None:
+        assert self._roi_layer is not None
         row_indices = set(index.row() for index in selected.indexes())
         self._roi_layer.selected_data = row_indices
         self._roi_layer.refresh()
@@ -293,6 +295,7 @@ class ROIWidget(QWidget):
                 "Delete",
             )
             if menu.exec(self._roi_table_view.mapToGlobal(pos)) == delete_action:
+                assert self._roi_layer_accessor is not None
                 del self._roi_layer_accessor[index.row()]
                 self._refresh_roi_table_widget(row_indices=[index.row()])
 
@@ -355,7 +358,7 @@ class ROIWidget(QWidget):
         if self._initialized and self.autosave_roi_file:
             self.save_roi_file()
 
-    def _on_roi_layer_mouse_drag(self, roi_layer: Shapes, event: "MouseEvent") -> None:
+    def _on_roi_layer_mouse_drag(self, roi_layer: Shapes, event: "MouseEvent"):
         if roi_layer.mode.startswith("add_"):
             self.current_roi_name = self._create_roi_name()
         if roi_layer.mode.startswith("add_") or roi_layer.mode in (
@@ -429,8 +432,9 @@ class ROIWidget(QWidget):
         )
 
     def _create_roi_name(self) -> str:
-        assert self._roi_layer_accessor is not None
+        assert self.new_roi_name is not None
         desired_roi_name = self.new_roi_name
+        assert self._roi_layer_accessor is not None
         existing_roi_names = [roi.name for roi in self._roi_layer_accessor]
         existing_roi_numbers = []
         regex = re.compile(rf"{desired_roi_name} \((?P<roi_number>\d+)\)")

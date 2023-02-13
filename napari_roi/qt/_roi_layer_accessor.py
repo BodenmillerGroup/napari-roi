@@ -37,7 +37,7 @@ class ROILayerAccessor(MutableSequence[ROIBase]):
             layer_data.insert(self._index, self._create_rectangle_data(roi))
             self._parent._layer.data = layer_data  # appends a row to features
             layer_features = features_to_pandas_dataframe(self._parent._layer.features)
-            layer_features: pd.DataFrame = pd.concat(
+            layer_features = pd.concat(
                 (
                     layer_features.iloc[: self._index],
                     layer_features.iloc[[-1]],
@@ -52,7 +52,7 @@ class ROILayerAccessor(MutableSequence[ROIBase]):
 
         def delete(self) -> None:
             layer_features = features_to_pandas_dataframe(self._parent._layer.features)
-            layer_features: pd.DataFrame = pd.concat(
+            layer_features = pd.concat(
                 (
                     layer_features.iloc[: self._index],
                     layer_features.iloc[self._index + 1 :],
@@ -150,7 +150,7 @@ class ROILayerAccessor(MutableSequence[ROIBase]):
                 ROIOrigin.BOTTOM_RIGHT,
             ):
                 return float(np.amax(self.data[:, -2]))
-            return NotImplementedError()
+            raise NotImplementedError()
 
         @y.setter
         def y(self, y: float) -> None:
@@ -250,21 +250,21 @@ class ROILayerAccessor(MutableSequence[ROIBase]):
     def insert(self, index: int, roi: ROIBase) -> None:
         ROILayerAccessor.ItemAccessor(self, index).insert(roi)
 
-    def __getitem__(self, index: int) -> ROIBase:
+    def __getitem__(self, index: int) -> ROIBase:  # type: ignore
         if index < 0:
             index = len(self._layer.data) + index
         if index < 0 or index >= len(self._layer.data):
             raise IndexError()
         return ROILayerAccessor.ItemAccessor(self, index)
 
-    def __setitem__(self, index: int, roi: ROIBase) -> None:
+    def __setitem__(self, index: int, roi: ROIBase) -> None:  # type: ignore
         if index < 0:
             index = len(self._layer.data) + index
         if index < 0 or index >= len(self._layer.data):
             raise IndexError()
         ROILayerAccessor.ItemAccessor(self, index).update(roi)
 
-    def __delitem__(self, index: int) -> None:
+    def __delitem__(self, index: int) -> None:  # type: ignore
         if index < 0:
             index = len(self._layer.data) + index
         if index < 0 or index >= len(self._layer.data):
@@ -287,19 +287,19 @@ class ROILayerAccessor(MutableSequence[ROIBase]):
         self._layer.metadata[self.NEW_ROI_NAME_METADATA_KEY] = new_roi_name
 
     @property
-    def new_roi_width(self) -> int:
+    def new_roi_width(self) -> float:
         return self._layer.metadata[self.NEW_ROI_WIDTH_METADATA_KEY]
 
     @new_roi_width.setter
-    def new_roi_width(self, new_roi_width: int) -> None:
+    def new_roi_width(self, new_roi_width: float) -> None:
         self._layer.metadata[self.NEW_ROI_WIDTH_METADATA_KEY] = new_roi_width
 
     @property
-    def new_roi_height(self) -> int:
+    def new_roi_height(self) -> float:
         return self._layer.metadata[self.NEW_ROI_HEIGHT_METADATA_KEY]
 
     @new_roi_height.setter
-    def new_roi_height(self, new_roi_height: int) -> None:
+    def new_roi_height(self, new_roi_height: float) -> None:
         self._layer.metadata[self.NEW_ROI_HEIGHT_METADATA_KEY] = new_roi_height
 
     @property
