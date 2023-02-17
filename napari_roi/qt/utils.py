@@ -11,10 +11,10 @@ class MutableItemModelSequenceWrapper(MutableSequence[T]):
         self._data = data
         self._model = model
 
-    def __getitem__(self, index: int) -> T:
+    def __getitem__(self, index: int) -> T:  # type: ignore
         return self._data[index]
 
-    def __setitem__(self, index: int, item: T) -> None:
+    def __setitem__(self, index: int, item: T) -> None:  # type: ignore
         self._data[index] = item
         self._model.dataChanged.emit(
             self._model.createIndex(index, 0),
@@ -22,7 +22,7 @@ class MutableItemModelSequenceWrapper(MutableSequence[T]):
             [Qt.ItemDataRole.EditRole],
         )
 
-    def __delitem__(self, index: int) -> None:
+    def __delitem__(self, index: int) -> None:  # type: ignore
         self._model.beginRemoveRows(QModelIndex(), index, index)
         del self._data[index]
         self._model.endRemoveRows()

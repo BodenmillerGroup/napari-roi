@@ -8,3 +8,4 @@ contributions:
   widgets:
   - command: napari-roi.ROIWidget
     display_name: regions of interest
+display_name: napari-roi

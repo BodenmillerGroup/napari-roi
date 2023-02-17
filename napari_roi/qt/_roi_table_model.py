@@ -2,7 +2,7 @@ from typing import Any, MutableSequence, Optional, Sequence
 
 from qtpy.QtCore import QAbstractTableModel, QModelIndex, QObject, Qt
 
-from .. import ROIBase
+from .. import ROI, ROIBase
 
 
 class ROITableModel(QAbstractTableModel):
@@ -127,7 +127,7 @@ class ROITableModel(QAbstractTableModel):
         if 0 <= row <= self.rowCount() and count > 0 and not parent.isValid():
             self.beginInsertRows(parent, row, row + count - 1)
             for i in range(row, row + count):
-                self._rois.insert(i, ROIBase())
+                self._rois.insert(i, ROI())
             self.endInsertRows()
             return True
         return False
