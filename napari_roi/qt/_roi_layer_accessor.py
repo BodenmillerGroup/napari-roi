@@ -235,17 +235,17 @@ class ROILayerAccessor(MutableSequence[ROIBase]):
         if self.NEW_ROI_WIDTH_METADATA_KEY not in layer.metadata:
             layer.metadata[self.NEW_ROI_WIDTH_METADATA_KEY] = self.DEFAULT_NEW_ROI_WIDTH
         if self.NEW_ROI_HEIGHT_METADATA_KEY not in layer.metadata:
-            layer.metadata[
-                self.NEW_ROI_HEIGHT_METADATA_KEY
-            ] = self.DEFAULT_NEW_ROI_HEIGHT
+            layer.metadata[self.NEW_ROI_HEIGHT_METADATA_KEY] = (
+                self.DEFAULT_NEW_ROI_HEIGHT
+            )
         if self.ROI_ORIGIN_METADATA_KEY not in layer.metadata:
             layer.metadata[self.ROI_ORIGIN_METADATA_KEY] = self.DEFAULT_ROI_ORIGIN
         if self.ROI_FILE_METADATA_KEY not in layer.metadata:
             layer.metadata[self.ROI_FILE_METADATA_KEY] = self.DEFAULT_ROI_FILE
         if self.AUTOSAVE_ROI_FILE_METADATA_KEY not in layer.metadata:
-            layer.metadata[
-                self.AUTOSAVE_ROI_FILE_METADATA_KEY
-            ] = self.DEFAULT_AUTOSAVE_ROI_FILE
+            layer.metadata[self.AUTOSAVE_ROI_FILE_METADATA_KEY] = (
+                self.DEFAULT_AUTOSAVE_ROI_FILE
+            )
 
     def insert(self, index: int, roi: ROIBase) -> None:
         ROILayerAccessor.ItemAccessor(self, index).insert(roi)
